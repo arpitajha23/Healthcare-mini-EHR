@@ -10,14 +10,15 @@ using ApplicationLayer.Service;
 using DomainLayer.DTOs;
 using InfrastructureLayer.IRepository;
 using InfrastructureLayer.Repository;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //connectionstring
 builder.Services.AddDbContext<HealthcareDbContext>(Options =>
-    Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    Options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.Configure<EncryptionDecrypt>(
+builder.Services.Configure<EncryptionSettings>(
     builder.Configuration.GetSection("EncryptionSettings"));
 
 // Email Settings
@@ -29,7 +30,7 @@ builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
 builder.Services.AddSingleton<DapperContext>();
-builder.Services.AddSingleton<EncryptionDecrypt>();
+builder.Services.AddScoped<EncryptionDecrypt>();
 builder.Services.AddScoped<EmailTemplates>();
 
 
@@ -50,17 +51,31 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var jwtSettings = builder.Configuration.GetSection("JWTSettings");
+
+    var secretKey = jwtSettings["SecretKey"];
+    var issuer = jwtSettings["Issuer"];
+    var audience = jwtSettings["Audience"];
+
+    if (string.IsNullOrWhiteSpace(secretKey))
+        throw new Exception("JWT SecretKey is missing in appsettings.json");
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
+
+        ValidIssuer = issuer,
+        ValidAudience = audience,
+
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(secretKey)
+        )
     };
 });
+
 
 builder.Services.AddAuthorization(options =>
 {
@@ -77,6 +92,25 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//    {
+//        options.JsonSerializerOptions.Converters.Add(
+//            new JsonStringEnumConverter()
+//        );
+//    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -88,6 +122,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseCors("AllowAll");
 app.UseAuthentication();
 
 app.UseAuthorization();

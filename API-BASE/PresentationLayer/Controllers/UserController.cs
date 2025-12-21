@@ -24,7 +24,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserRegistrationDto dto)
+        public async Task<IActionResult> Register([FromBody]UserRegistrationDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

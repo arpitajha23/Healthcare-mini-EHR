@@ -36,6 +36,7 @@ namespace ApplicationLayer.Service
 
         public async Task<UserRegistrationResponseDto> RoleBaseRegisterAsync(UserRegistrationDto dto)
         {
+            
             var existing = await _userRepository.GetUserByEmailAsync(dto.Email, dto.Role.ToString());
             if (existing != null)
                 throw new InvalidOperationException("Email already exists.");
@@ -46,7 +47,8 @@ namespace ApplicationLayer.Service
                 Email = dto.Email,
                 Phone = _encryptionDecrypt.Encrypt(dto.Phone),
                 Dob = dto.DOB.HasValue ? DateOnly.FromDateTime(dto.DOB.Value) : null,
-                Gender = _encryptionDecrypt.Encrypt(dto.Gender),
+                //Gender = _encryptionDecrypt.Encrypt(dto.Gender),
+                Gender =dto.Gender,
                 Role = dto.Role.ToString(),
                 PasswordHash = PasswordHasher.HashPassword(dto.Password),
                 IsActive = true,
@@ -66,7 +68,7 @@ namespace ApplicationLayer.Service
 
             return new UserRegistrationResponseDto
             {
-                UserId = newUser.UserId,
+                //UserId = newUser.UserId,
                 Name = newUser.FullName,
                 MaskedEmail = MaskHelpers.MaskEmail(newUser.Email),
                 MaskedPhone = MaskHelpers.MaskPhone(dto.Phone),

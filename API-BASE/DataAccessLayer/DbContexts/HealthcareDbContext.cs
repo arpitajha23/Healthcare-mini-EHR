@@ -128,7 +128,7 @@ public partial class HealthcareDbContext : DbContext
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("created_at");
             entity.Property(e => e.Dob).HasColumnName("dob");
             entity.Property(e => e.Email).HasColumnName("email");
@@ -146,7 +146,7 @@ public partial class HealthcareDbContext : DbContext
                 .HasColumnName("role");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("updated_at");
         });
 

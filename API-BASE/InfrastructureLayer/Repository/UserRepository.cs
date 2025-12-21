@@ -26,9 +26,17 @@ namespace InfrastructureLayer.Repository
 
         public async Task<User> RegisterUserAsync(User user)
         {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user;
+            try
+            {
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+                return user;
+            }
+            catch (DbUpdateException ex)
+            {
+                var dbMessage = ex.InnerException?.Message ?? ex.Message;
+                throw new Exception($"DB ERROR: {dbMessage}", ex);
+            }
         }
 
         public async Task<User?> GetByIdAsync(int userId)
