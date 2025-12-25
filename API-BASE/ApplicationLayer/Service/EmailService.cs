@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using DomainLayer.DTOs;
 using Microsoft.Extensions.Options;
 using DomainLayer.CommonMethod;
+using static DomainLayer.Enums.Enums;
 
 namespace ApplicationLayer.Service
 {
@@ -54,9 +55,9 @@ namespace ApplicationLayer.Service
             await SendEmailAsync(to, subject, body);
         }
 
-        public async Task SendOtpEmailAsync(string to, string otp)
+        public async Task SendOtpEmailAsync(string to, string otp, string fullName)
         {
-            var (subject, body) = _template.OtpTemplate(otp);
+            var (subject, body) = _template.OtpTemplate(otp, fullName, Reason.Login);
             await SendEmailAsync(to, subject, body);
         }
 

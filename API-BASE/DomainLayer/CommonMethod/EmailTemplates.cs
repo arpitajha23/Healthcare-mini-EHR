@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DomainLayer.Enums.Enums;
 
 namespace DomainLayer.CommonMethod
 {
@@ -58,36 +59,91 @@ namespace DomainLayer.CommonMethod
         }
 
 
-        public (string Subject, string Body) OtpTemplate(string otp)
+        public (string Subject, string Body) OtpTemplate(string otp, string fullName, Reason reason)
         {
-            string subject = "🔐 Your OTP Code";
+            string subject = $"🔐 {reason} OTP Verification Code";
 
             string body = $@"
-    <div style='font-family: Arial, Helvetica, sans-serif; background-color:#f4f6f8; padding:20px;'>
-        <div style='max-width:600px; margin:auto; background:#ffffff; border-radius:8px; padding:25px;'>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+</head>
+<body style='margin:0; padding:0; background-color:#eef2f7;'>
 
-            <h2 style='color:#4c87b9; text-align:center;'>OTP Verification</h2>
+<table width='100%' cellpadding='0' cellspacing='0' style='background-color:#eef2f7; padding:30px 0;'>
+<tr>
+<td align='center'>
 
-            <p style='font-size:15px; color:#333; text-align:center;'>
-                Use the following One-Time Password to continue:
+<table width='600' cellpadding='0' cellspacing='0' style='background:#ffffff; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,0.08); overflow:hidden;'>
+
+    <!-- Header -->
+    <tr>
+        <td style='background:linear-gradient(135deg, #4c87b9, #6fa8dc); padding:25px; text-align:center;'>
+            <h1 style='margin:0; color:#ffffff; font-family:Arial, sans-serif; font-size:24px;'>
+                OTP Verification
+            </h1>
+        </td>
+    </tr>
+
+    <!-- Content -->
+    <tr>
+        <td style='padding:30px; font-family:Arial, Helvetica, sans-serif; color:#333;'>
+
+            <p style='font-size:16px;'>Hello <strong>{fullName}</strong>,</p>
+
+            <p style='font-size:15px; line-height:1.6;'>
+                You requested an OTP for <strong>{reason}</strong>.
+                Please use the code below to continue.
             </p>
 
-            <div style='text-align:center; margin:25px 0;'>
-                <span style='font-size:24px; letter-spacing:4px; font-weight:bold; background:#f0f7ff; padding:12px 20px; border-radius:6px; display:inline-block;'>
+            <!-- OTP Box -->
+            <div style='text-align:center; margin:30px 0;'>
+                <span style='
+                    display:inline-block;
+                    background:#f0f7ff;
+                    color:#2c5aa0;
+                    font-size:28px;
+                    letter-spacing:6px;
+                    font-weight:bold;
+                    padding:15px 30px;
+                    border-radius:8px;
+                    border:2px dashed #4c87b9;'>
                     {otp}
                 </span>
             </div>
 
-            <p style='font-size:14px; color:#777; text-align:center;'>
-                Do not share this code with anyone.  
-                This OTP is valid for a limited time.
+            <p style='font-size:14px; color:#555; text-align:center;'>
+                ⏱ This OTP is valid for a limited time.
             </p>
 
-        </div>
-    </div>";
+            <p style='font-size:14px; color:#777; text-align:center;'>
+                🔒 For your security, do not share this code with anyone.
+            </p>
+
+        </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+        <td style='background:#f7f9fc; padding:18px; text-align:center; font-family:Arial, sans-serif; font-size:13px; color:#888;'>
+            If you did not request this OTP, please ignore this email.<br/>
+            <strong>HealthcareFriend</strong>
+        </td>
+    </tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>";
 
             return (subject, body);
         }
+
 
         public (string Subject, string Body) ResetPasswordTemplate(string name, string link)
         {

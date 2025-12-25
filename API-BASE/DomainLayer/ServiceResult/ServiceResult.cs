@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DomainLayer.ServiceResult
 {
-    public class ServiceResult<T>
+    public class ServiceResult
     {
-        public bool Success { get; set; }
+        public string Success { get; set; }
         public string Message { get; set; }
-        public T? Data { get; set; }
+        public string Data { get; set; }
 
-        public ServiceResult(bool success, string message, T? data = default)
+        public ServiceResult(string success, string message, string data = default)
         {
             Success = success;
             Message = message;

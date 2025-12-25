@@ -12,8 +12,11 @@ namespace ApplicationLayer.IService
     public interface IUserService
     {
         Task<UserRegistrationResponseDto> RoleBaseRegisterAsync(UserRegistrationDto dto);
-        Task<ServiceResult<bool>> GetUserByEmailAsync(string email, string Role);
+        Task<ServiceResult> GetUserByEmailAsync(string email, string Role);
         Task RequestPasswordResetAsync(UserPasswordResetRequestDto dto);
+        Task<User> GetUserByEmailandRole(string email, string Role);
         Task ResetPasswordAsync(ResetPasswordDto dto);
+        Task SendLoginOtpAsync(int userId);
+        Task<User> VerifyLoginOtpAsync(int userId, string otp);
     }
 }

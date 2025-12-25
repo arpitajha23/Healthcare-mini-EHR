@@ -37,6 +37,7 @@ builder.Services.AddScoped<EmailTemplates>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPatientAuthService, PatientAuthService>();
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();

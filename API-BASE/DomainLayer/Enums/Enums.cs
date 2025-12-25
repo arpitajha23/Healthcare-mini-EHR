@@ -14,5 +14,10 @@ namespace DomainLayer.Enums
             Patient,
             Doctor
         }
+        public enum Reason
+        {
+            Login = 1,
+            ResetPassword = 2
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DomainLayer.Enums.Enums;
 
 namespace InfrastructureLayer.IRepository
 {
@@ -13,5 +14,7 @@ namespace InfrastructureLayer.IRepository
         Task<User> RegisterUserAsync(User user);
         Task<User?> GetByIdAsync(int userId);
         Task UpdateUserAsync(User user);
+        Task<string> CreateOtpAsync(long userId, Reason otpType, int expiryMinutes);
+        Task<bool> VerifyOtpAsync(long userId, string otp, Reason otpType);
     }
 }

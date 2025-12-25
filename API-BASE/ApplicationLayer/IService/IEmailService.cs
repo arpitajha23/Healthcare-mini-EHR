@@ -10,7 +10,7 @@ namespace ApplicationLayer.IService
     {
         Task SendEmailAsync(string to, string subject, string body, bool isHtml = true);
         Task SendWelcomeEmailAsync(string to, string name);
-        Task SendOtpEmailAsync(string to, string otp);
+        Task SendOtpEmailAsync(string to, string otp, string fullName);
         Task SendResetPasswordEmailAsync(string to, string name, string link);
     }
 }

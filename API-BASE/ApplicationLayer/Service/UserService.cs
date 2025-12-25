@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using static DomainLayer.Enums.Enums;
 
 namespace ApplicationLayer.Service
 {
@@ -78,18 +79,30 @@ namespace ApplicationLayer.Service
             };
         }
 
-        public async Task<ServiceResult<bool>> GetUserByEmailAsync(string email, string Role)
+        public async Task<ServiceResult> GetUserByEmailAsync(string email, string Role)
         {
             try
             {
                 var exists = await _userRepository.GetUserByEmailAsync(email, Role);
                 if (exists != null)
-                    return new ServiceResult<bool>(true, "Email already exists", true);
+                    return new ServiceResult(null, "Email already exists", null);
 
-                return new ServiceResult<bool>(true, "Email available", false);
+                return new ServiceResult(null, "Email available", exists.ToString());
             }
-            catch (Exception ex) { 
-                return new ServiceResult<bool>(true, "Email available", false); ;
+            catch (Exception ex) {
+                return new ServiceResult(null, "Email available", null); ; ;
+            }
+        }
+        public async Task<User> GetUserByEmailandRole(string email, string Role)
+        {
+            try
+            {
+                return  await _userRepository.GetUserByEmailAsync(email, Role);
+                
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
         }
 
@@ -137,6 +150,21 @@ namespace ApplicationLayer.Service
 
             await _userRepository.UpdateUserAsync(user);
         }
+        public async Task SendLoginOtpAsync(int userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            var otp = await _userRepository.CreateOtpAsync(userId, Reason.Login, 5);
+            await _emailService.SendOtpEmailAsync(user.Email, otp, $"{user.FullName}");
+        }
+        public async Task<User> VerifyLoginOtpAsync(int userId, string otp)
+        {
+            var isValid = await _userRepository.VerifyOtpAsync(userId, otp, Reason.Login);
+            if (!isValid) return null;
+
+            return await _userRepository.GetByIdAsync(userId);
+        }
+
 
     }
 }

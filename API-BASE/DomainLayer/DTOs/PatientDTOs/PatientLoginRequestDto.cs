@@ -14,5 +14,15 @@ namespace DomainLayer.DTOs.PatientDTOs
 
         [Required]
         public string Password { get; set; }
+
+        [Required]
+        public string Role { get; set; }
+    }
+    public class VerifyOtpRequest
+    {
+        [Required]
+        public int UserId { get; set; }
+        [Required]
+        public string Otp { get; set; }
     }
 }
