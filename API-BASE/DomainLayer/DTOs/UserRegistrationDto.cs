@@ -37,7 +37,7 @@ namespace DomainLayer.DTOs
         public string Gender { get; set; }
 
         [Required]
-        public string Role { get; set; }
+        public int Role { get; set; }
     }
 
     public class UserRegistrationResponseDto
@@ -46,7 +46,7 @@ namespace DomainLayer.DTOs
         public string Name { get; set; }
         public string MaskedEmail { get; set; }
         public string MaskedPhone { get; set; }
-        public string Role { get; set; }
+        public int Role { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }

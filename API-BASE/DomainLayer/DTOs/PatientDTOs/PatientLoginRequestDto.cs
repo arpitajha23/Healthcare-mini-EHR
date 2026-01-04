@@ -16,7 +16,7 @@ namespace DomainLayer.DTOs.PatientDTOs
         public string Password { get; set; }
 
         [Required]
-        public string Role { get; set; }
+        public int Role { get; set; }
     }
     public class VerifyOtpRequest
     {
@@ -25,4 +25,10 @@ namespace DomainLayer.DTOs.PatientDTOs
         [Required]
         public string Otp { get; set; }
     }
+
+    public class ResendOtpRequest
+    {
+        public int UserId { get; set; }
+    }
+
 }

@@ -24,14 +24,17 @@ public partial class User
     [Column("gender")]
     public string? Gender { get; set; }
 
-    [Column("role")]
-    public string Role { get; set; }
+    //[Column("role")]
+    //public string Role { get; set; }
+
+    [Column("role_id")]
+    public int RoleId { get; set; }
 
     [Column("password_hash")]
     public string PasswordHash { get; set; }
 
     [Column("is_active")]
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     [Column("is_locked")]
     public bool? IsLocked { get; set; }

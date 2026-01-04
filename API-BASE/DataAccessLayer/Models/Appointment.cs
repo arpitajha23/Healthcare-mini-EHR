@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static DomainLayer.Enums.Enums;
 
 namespace DataAccessLayer.Models;
 
@@ -15,8 +16,9 @@ public partial class Appointment
 
     public string? Reason { get; set; }
 
-    public string Status { get; set; } = null!;
+    public int StatusId { get; set; }
 
+    public int Mode { get; set; }
     public DateTime? CreatedAt { get; set; }
 
     public virtual User Doctor { get; set; } = null!;

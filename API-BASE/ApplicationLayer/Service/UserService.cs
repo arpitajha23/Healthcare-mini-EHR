@@ -31,14 +31,14 @@ namespace ApplicationLayer.Service
             _encryptionDecrypt = encryptionDecrypt;
             _emailService = emailService;
             _jwtService = jwtService;
-            _frontendBaseUrl = configuration["FrontendSettings:BaseUrl"] ?? "https://localhost:4200";
+            _frontendBaseUrl = configuration["FrontendSettings:BaseUrl"] ?? "http://localhost:4200";
 
         }
 
         public async Task<UserRegistrationResponseDto> RoleBaseRegisterAsync(UserRegistrationDto dto)
         {
             
-            var existing = await _userRepository.GetUserByEmailAsync(dto.Email, dto.Role.ToString());
+            var existing = await _userRepository.GetUserByEmailAsync(dto.Email, dto.Role);
             if (existing != null)
                 throw new InvalidOperationException("Email already exists.");
 
@@ -46,11 +46,12 @@ namespace ApplicationLayer.Service
             {
                 FullName = dto.Name,
                 Email = dto.Email,
-                Phone = _encryptionDecrypt.Encrypt(dto.Phone),
+                //Phone = _encryptionDecrypt.Encrypt(dto.Phone),
+                Phone = dto.Phone,
                 Dob = dto.DOB.HasValue ? DateOnly.FromDateTime(dto.DOB.Value) : null,
                 //Gender = _encryptionDecrypt.Encrypt(dto.Gender),
                 Gender =dto.Gender,
-                Role = dto.Role.ToString(),
+                RoleId = dto.Role,
                 PasswordHash = PasswordHasher.HashPassword(dto.Password),
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
@@ -73,13 +74,13 @@ namespace ApplicationLayer.Service
                 Name = newUser.FullName,
                 MaskedEmail = MaskHelpers.MaskEmail(newUser.Email),
                 MaskedPhone = MaskHelpers.MaskPhone(dto.Phone),
-                Role = newUser.Role,
+                Role = newUser.RoleId,
                 CreatedAt = newUser.CreatedAt ?? DateTime.UtcNow,
                 IsActive = true
             };
         }
 
-        public async Task<ServiceResult> GetUserByEmailAsync(string email, string Role)
+        public async Task<ServiceResult> GetUserByEmailAsync(string email, int Role)
         {
             try
             {
@@ -93,7 +94,7 @@ namespace ApplicationLayer.Service
                 return new ServiceResult(null, "Email available", null); ; ;
             }
         }
-        public async Task<User> GetUserByEmailandRole(string email, string Role)
+        public async Task<User> GetUserByEmailandRole(string email, int Role)
         {
             try
             {
@@ -117,9 +118,9 @@ namespace ApplicationLayer.Service
             var resetToken = _jwtService.GenerateToken(
                 new Dictionary<string, string>
                 {
-            { "UserId", user.UserId.ToString() },
-            { "Role", user.Role },
-            { "TokenType", "PasswordReset" }
+                    { "UserId", user.UserId.ToString() },
+                    { "Role", user.RoleId.ToString() },
+                    { "TokenType", "PasswordReset" }
                 },
                 expiryMinutes: 15
             );
@@ -154,17 +155,33 @@ namespace ApplicationLayer.Service
         {
             var user = await _userRepository.GetByIdAsync(userId);
 
-            var otp = await _userRepository.CreateOtpAsync(userId, Reason.Login, 5);
-            await _emailService.SendOtpEmailAsync(user.Email, otp, $"{user.FullName}");
+            //var otp = await _userRepository.CreateOtpAsync(userId, Reason.Login, 5);
+            var otp = await _userRepository.CreateOtpAsync(userId, Convert.ToInt32(OtpType.Login), 5);
+            Console.WriteLine($"OTP: {otp}");
+            //await _emailService.SendOtpEmailAsync(user.Email, otp, $"{user.FullName}");
         }
         public async Task<User> VerifyLoginOtpAsync(int userId, string otp)
         {
-            var isValid = await _userRepository.VerifyOtpAsync(userId, otp, Reason.Login);
+            //var isValid = await _userRepository.VerifyOtpAsync(userId, otp, Reason.Login);
+            var isValid = await _userRepository.VerifyOtpAsync(userId, otp, Convert.ToInt32(OtpType.Login));
             if (!isValid) return null;
 
             return await _userRepository.GetByIdAsync(userId);
         }
 
+        public async Task<VerifyEmailResponse> VerifyEmailAsync(string email)
+        {
+            var result = await _userRepository.VerifyEmailAsync(email);
 
+            if (result == null)
+            {
+                return new VerifyEmailResponse
+                {
+                    IsAvailable = false
+                };
+            }
+
+            return result;
+        }
     }
 }

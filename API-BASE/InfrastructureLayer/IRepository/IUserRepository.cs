@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Models;
+using DomainLayer.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,14 @@ namespace InfrastructureLayer.IRepository
 {
     public interface IUserRepository
     {
-        Task<User?> GetUserByEmailAsync(string email, string Role);
+        Task<User?> GetUserByEmailAsync(string email, int Role);
         Task<User> RegisterUserAsync(User user);
         Task<User?> GetByIdAsync(int userId);
         Task UpdateUserAsync(User user);
-        Task<string> CreateOtpAsync(long userId, Reason otpType, int expiryMinutes);
-        Task<bool> VerifyOtpAsync(long userId, string otp, Reason otpType);
+        Task<string> CreateOtpAsync(long userId, int otpType, int expiryMinutes);
+        //Task<bool> VerifyOtpAsync(long userId, string otp, Reason otpType);
+        Task<bool> VerifyOtpAsync(long userId, string otp, int otpType);
+        Task<VerifyEmailResponse?> VerifyEmailAsync(string email);
+
     }
 }

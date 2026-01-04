@@ -35,7 +35,6 @@
 
   <ItemGroup>
     <Folder Include="AdminController\" />
-    <Folder Include="DoctorController\" />
   </ItemGroup>
 
 </Project>

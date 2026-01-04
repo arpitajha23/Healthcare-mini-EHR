@@ -27,39 +27,39 @@ namespace PresentationLayer.PatientController
             _jwtService = jwtService;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(PatientLoginRequestDto request)
-        {
-            var user = await _userService.GetUserByEmailandRole(request.Email, request.Role);
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login(PatientLoginRequestDto request)
+        //{
+        //    var user = await _userService.GetUserByEmailandRole(request.Email, request.Role);
 
-            if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
-                return Unauthorized("Invalid credentials");
-            // Generate OTP
-            await _userService.SendLoginOtpAsync(user.UserId);
-            return Ok(new { message = "OTP sent", userId = user.UserId });
-        }
+        //    if (user == null || !PasswordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        //        return Unauthorized("Invalid credentials");
+        //    // Generate OTP
+        //    await _userService.SendLoginOtpAsync(user.UserId);
+        //    return Ok(new { message = "OTP sent", userId = user.UserId });
+        //}
 
-        [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpRequest request)
-        {
-            var otpValid = await _userService.VerifyLoginOtpAsync(request.UserId, request.Otp);
+        //[HttpPost("verify-otp")]
+        //public async Task<IActionResult> VerifyOtp(VerifyOtpRequest request)
+        //{
+        //    var otpValid = await _userService.VerifyLoginOtpAsync(request.UserId, request.Otp);
 
-            if (otpValid == null)
-                return BadRequest("Invalid or expired OTP");
+        //    if (otpValid == null)
+        //        return BadRequest("Invalid or expired OTP");
 
-            var claims = new Dictionary<string, string>
-            {
-                { ClaimTypes.NameIdentifier, otpValid.UserId.ToString() },
-                { ClaimTypes.Email, otpValid.Email },
-                { ClaimTypes.Name, $"{otpValid.FullName}" },
-                { ClaimTypes.Role, otpValid.Role }
-            };
+        //    var claims = new Dictionary<string, string>
+        //    {
+        //        { ClaimTypes.NameIdentifier, otpValid.UserId.ToString() },
+        //        { ClaimTypes.Email, otpValid.Email },
+        //        { ClaimTypes.Name, $"{otpValid.FullName}" },
+        //        { ClaimTypes.Role, otpValid.Role }
+        //    };
 
-            var token = _jwtService.GenerateToken(claims, 60);
+        //    var token = _jwtService.GenerateToken(claims, 60);
 
 
-            return Ok(new{ token, message = "Login successful" });
-        }
+        //    return Ok(new{ token, message = "Login successful" });
+        //}
 
 
     }

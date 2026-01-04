@@ -24,10 +24,12 @@ public partial class HealthcareDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<LoginAuditLog> LoginAuditLogs { get; set; }
+    public virtual DbSet<OtpHistory> OtpHistories { get; set; }
 
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=healthcare;Username=postgres;Password=welcome");
+
+    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    //        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=healthcare;Username=postgres;Password=welcome");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,10 +50,16 @@ public partial class HealthcareDbContext : DbContext
             entity.Property(e => e.DoctorId).HasColumnName("doctor_id");
             entity.Property(e => e.PatientId).HasColumnName("patient_id");
             entity.Property(e => e.Reason).HasColumnName("reason");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("'pending'::character varying")
-                .HasColumnName("status");
+            entity.Property(e => e.StatusId)
+                 .HasColumnName("status_id")
+                 .HasConversion<short>()   // enum → smallint
+                 .IsRequired();
+
+                    /* 🔥 MODE (SMALLINT) */
+                    entity.Property(e => e.Mode)
+                          .HasColumnName("mode")
+                          .HasConversion<short>()   // enum → smallint
+                          .IsRequired();
 
             entity.HasOne(d => d.Doctor).WithMany(p => p.AppointmentDoctors)
                 .HasForeignKey(d => d.DoctorId)
@@ -141,13 +149,46 @@ public partial class HealthcareDbContext : DbContext
                 .HasColumnName("is_active");
             entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
             entity.Property(e => e.Phone).HasColumnName("phone");
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .HasColumnName("role");
+            entity.Property(e => e.RoleId)
+                .HasColumnName("role_id")
+                .IsRequired();
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamptz")
                 .HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<OtpHistory>(entity =>
+        {
+            entity.HasKey(e => e.OtpId).HasName("otp_history_pkey");
+
+            entity.ToTable("otp_history");
+
+            entity.Property(e => e.OtpId).HasColumnName("otp_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.OtpCode)
+                .HasMaxLength(6)
+                .HasColumnName("otp_code");
+
+            entity.Property(e => e.OtpTypeId)
+                .HasColumnName("otp_type_id");
+
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("expires_at");
+
+            entity.Property(e => e.IsVerified)
+                .HasDefaultValue(false)
+                .HasColumnName("is_verified");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("otp_history_user_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

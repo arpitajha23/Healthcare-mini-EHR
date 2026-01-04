@@ -24,7 +24,7 @@ namespace ApplicationLayer.Service
         {
             var claimsList = claims.Select(c => new Claim(c.Key, c.Value)).ToList();
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -41,7 +41,7 @@ namespace ApplicationLayer.Service
         public ClaimsPrincipal? ValidateToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_settings.Secret);
+            var key = Encoding.UTF8.GetBytes(_settings.SecretKey);
 
             var parameters = new TokenValidationParameters
             {

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using static DomainLayer.Enums.Enums;
+using DomainLayer.DTOs;
 
 
 namespace InfrastructureLayer.Repository
@@ -25,9 +26,9 @@ namespace InfrastructureLayer.Repository
             _dapperContext = dapperContext;
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email, string Role)
+        public async Task<User?> GetUserByEmailAsync(string email, int Role)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Role == Role);
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.RoleId == Role);
         }
 
         public async Task<User> RegisterUserAsync(User user)
@@ -55,7 +56,8 @@ namespace InfrastructureLayer.Repository
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
-        public async Task<string> CreateOtpAsync(long userId, Reason otpType, int expiryMinutes)
+        //public async Task<string> CreateOtpAsync(long userId, Reason otpType, int expiryMinutes)
+        public async Task<string> CreateOtpAsync(long userId, int otpType, int expiryMinutes)
         {
             using var connection = _dapperContext.CreateConnection();
 
@@ -64,7 +66,8 @@ namespace InfrastructureLayer.Repository
             
              new { UserId = userId, OtpType = otpType, Expiry = expiryMinutes });
         }
-        public async Task<bool> VerifyOtpAsync(long userId, string otp, Reason otpType)
+        //public async Task<bool> VerifyOtpAsync(long userId, string otp, Reason otpType)
+        public async Task<bool> VerifyOtpAsync(long userId, string otp, int otpType)
         {
             using var connection = _dapperContext.CreateConnection();
 
@@ -74,6 +77,21 @@ namespace InfrastructureLayer.Repository
             new{ UserId = userId, Otp = otp, OtpType = otpType });
         }
 
+        public async Task<VerifyEmailResponse?> VerifyEmailAsync(string email)
+        {
+            using var connection = _dapperContext.CreateConnection();
+
+            return await connection.QueryFirstOrDefaultAsync<VerifyEmailResponse>(
+                @"SELECT 
+                TRUE AS IsAvailable,
+                email,
+                role_id AS Role
+              FROM users
+              WHERE LOWER(email) = LOWER(@Email)
+                AND is_active = TRUE",
+                new { Email = email }
+            );
+        }
 
     }
 }

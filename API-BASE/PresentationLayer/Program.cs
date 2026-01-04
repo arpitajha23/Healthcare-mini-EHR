@@ -11,6 +11,7 @@ using DomainLayer.DTOs;
 using InfrastructureLayer.IRepository;
 using InfrastructureLayer.Repository;
 using System.Text.Json.Serialization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,11 +38,14 @@ builder.Services.AddScoped<EmailTemplates>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IDoctorAppointmentsService, DoctorAppointmentsService>();
+
 builder.Services.AddScoped<IPatientAuthService, PatientAuthService>();
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILoginAuditRepository, LoginAuditRepository>();
+builder.Services.AddScoped<IDoctorAppointmentsRepository, DoctorAppointmentsRepository>();
 
 
 // Configure JWT authentication
@@ -73,7 +77,9 @@ builder.Services.AddAuthentication(options =>
 
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(secretKey)
-        )
+        ),
+         NameClaimType = ClaimTypes.NameIdentifier,
+        RoleClaimType = ClaimTypes.Role
     };
 });
 

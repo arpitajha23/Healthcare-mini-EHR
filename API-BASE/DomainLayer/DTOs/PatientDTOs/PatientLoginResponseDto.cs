@@ -11,6 +11,6 @@ namespace DomainLayer.DTOs.PatientDTOs
         public string Token { get; set; }
         public string MaskedEmail { get; set; }
         public string MaskedPhone { get; set; }
-        public string Role { get; set; }
+        public int Role { get; set; }
     }
 }

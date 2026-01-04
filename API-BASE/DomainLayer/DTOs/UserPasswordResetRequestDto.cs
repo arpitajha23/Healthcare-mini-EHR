@@ -13,6 +13,6 @@ namespace DomainLayer.DTOs
         [EmailAddress(ErrorMessage = "Enter a valid email address.")]
         public string Email { get; set; }
 
-        public string Role { get; set; }
+        public int Role { get; set; }
     }
 }
